@@ -24,10 +24,7 @@ workflows:
   version: 2.1
   build:
     jobs:
-      - build_ubuntu:
-          filters:
-            tags:
-              ignore: /.*/
+      - build_ubuntu
       - build_docs:
           requires:
             - build_ubuntu
