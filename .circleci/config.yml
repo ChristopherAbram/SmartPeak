@@ -29,7 +29,10 @@ jobs:
           command: |
             VERSION=${CIRCLE_TAG}
             mkdir bin
-            curl https://docs.readthedocs.io/en/stable/versions.html > bin/tmpfile
+            cd bin &&
+            curl -H "Circle-Token: ${CIRCLE_TOKEN}" https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BUILD_NUM}/artifacts \
+              | grep -o 'https://[^"]*' \
+              | wget --verbose --header "Circle-Token: $CIRCLE_TOKEN" --input-file -
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} bin
 
 workflows:
