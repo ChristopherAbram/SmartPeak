@@ -12,22 +12,39 @@ jobs:
       - checkout
       - run: |
           apt-get update
-  
-  build_docs:
+          apt-get install curl -y
+          curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile
+          cp tmpfile /tmp/artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
+
+  publish_release:
     docker:
-      - image: ubuntu:20.04
+      - image: cibuilds/github:0.10
     steps:
-      - run: |
-          apt-get update
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 workflows:
   version: 2.1
   build:
     jobs:
-      - build_ubuntu
-      - build_docs:
+      - build_ubuntu:
           filters:
             tags:
               only: /.*/
             branches:
-              only: develop
+              only: /.*/
+      - publish_release:
+          requires:
+            - build_ubuntu
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
