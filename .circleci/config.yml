@@ -30,8 +30,13 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             VERSION=${CIRCLE_TAG}
+            which jq
+            which apt
+            which pip
             mkdir bin
-            curl -H "Circle-Token: ${CIRCLE_TOKEN}" "https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${VERSION}/artifacts?branch=develop&tag=${VERSION}"
+            JOB_NUMBERS=$(curl -s https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/job\?circle-token\=${CIRCLE_TOKEN} | jq -r '.items[] | select (.type? == "build") | .job_number')
+            echo $JOB_NUMBERS | tr " " "\n" > art_test.txt
+            echo "Searching for Artifacts .........."
 
 workflows:
   version: 2.1
