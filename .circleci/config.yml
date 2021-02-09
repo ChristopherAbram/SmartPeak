@@ -29,14 +29,9 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            echo ${CIRCLE_WORKFLOW_ID}
             VERSION=${CIRCLE_TAG}
             mkdir bin
-            cd bin &&
-            curl -H "Circle-Token: ${CIRCLE_TOKEN}" https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BUILD_NUM}/artifacts \
-              | grep -o 'https://[^"]*' \
-              | wget --verbose --header "Circle-Token: $CIRCLE_TOKEN" --input-file -
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} bin
+            curl -H "Circle-Token: ${CIRCLE_TOKEN}" "https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${VERSION}/artifacts?branch=develop&tag=${VERSION}"
 
 workflows:
   version: 2.1
