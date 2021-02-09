@@ -28,7 +28,11 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             VERSION=${CIRCLE_TAG}
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/artifacts
+            apt-get update
+            apt-get install curl -y
+            mkdir bin
+            curl https://docs.readthedocs.io/en/stable/versions.html > bin/tmpfile
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} bin
 
 workflows:
   version: 2.1
