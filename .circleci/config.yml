@@ -11,6 +11,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo ${CIRCLE_WORKFLOW_ID}
           apt-get update
           apt-get install curl -y
           curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile
