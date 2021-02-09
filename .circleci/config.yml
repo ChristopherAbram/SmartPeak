@@ -31,10 +31,9 @@ jobs:
           command: |
             VERSION=${CIRCLE_TAG}
             which jq
-            which apt
-            which pip
             mkdir bin
             JOB_NUMBERS=$(curl -s https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/job\?circle-token\=${CIRCLE_TOKEN} | jq -r '.items[] | select (.type? == "build") | .job_number')
+            echo ${JOB_NUMBERS}
             echo $JOB_NUMBERS | tr " " "\n" > art_test.txt
             echo "Searching for Artifacts .........."
 
