@@ -12,7 +12,6 @@ jobs:
       - checkout
       - run: |
           echo ${CIRCLE_WORKFLOW_ID}
-          CIRCLE_WORKFLOW_ID="${CIRCLE_WORKFLOW_ID}:CIRCLE_BUILD_NUM"
           apt-get update
           apt-get install curl -y
           curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile
@@ -30,9 +29,8 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             VERSION=${CIRCLE_TAG}
-            which jq
-            mkdir bin
-            JOB_NUMBERS=$(curl -s https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/job\?circle-token\=${CIRCLE_TOKEN} | jq -r '.items[] | select (.type? == "build") | .job_number')
+            mkdir arts
+            JOB_NUMBERS=$(curl -s "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/job?circle-token=${CIRCLE_TOKEN}"" | jq -r '.items[] | select (.type? == "build") | .job_number')
             echo ${JOB_NUMBERS}
             echo $JOB_NUMBERS | tr " " "\n" > art_test.txt
             echo "Searching for Artifacts .........."
