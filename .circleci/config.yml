@@ -15,7 +15,7 @@ jobs:
           apt-get update
           apt-get install curl -y
           curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile1
-          cp tmpfile /tmp/artifacts
+          cp tmpfile1 /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -30,7 +30,7 @@ jobs:
           apt-get update
           apt-get install curl -y
           curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile2
-          cp tmpfile /tmp/artifacts
+          cp tmpfile2 /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
