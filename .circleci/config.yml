@@ -4,72 +4,6 @@ orbs:
   win: circleci/windows@2.4.0
 
 jobs:
-  build_ubuntu:
-    docker:
-      - image: ubuntu:20.04
-    working_directory: ~/SmartPeak
-    steps:
-      - checkout
-      - run: |
-          apt-get update
-      - run: |
-          export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
-          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata &&
-          apt-get install -y git cmake qt5-default libeigen3-dev
-      - run: |
-          apt-get install -y libboost-all-dev &&
-          apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
-          apt-get install -y libwildmagic-dev libsqlite3-dev &&
-          apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
-      - run: |
-          apt-get install -y graphviz doxygen python3-pip &&
-          export DEBIAN_FRONTEND=noninteractive &&
-          apt-get install -y tzdata &&
-          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata &&
-          apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-          pip3 install exhale
-      - run: |
-          cd ~ &&
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          cd OpenMS && git submodule update --init THIRDPARTY &&
-          cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
-          make -j4 OpenMS
-      - run:
-          command: |
-            cd ~/SmartPeak
-            #mkdir superbuild
-            cd superbuild
-            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
-            make -j4
-      - run:
-          command: |
-            mkdir ~/SmartPeak_build
-            cd ~/SmartPeak_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
-            make -j4
-      - run:
-          command: |
-            cd ~/SmartPeak_build || exit 1
-            ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
-            ctest -V
-            ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
-      - run:
-          command: |
-            ~/SmartPeak/.circleci/run_examples.sh ~/SmartPeak_build/bin
-      - run:
-          command: |
-            set -o xtrace
-            cd ~/SmartPeak_build
-            cpack -V
-            ls -lh ~/SmartPeak_build | grep -a .deb
-            dpkg -c ~/SmartPeak_build/*.deb
-            mkdir -p /tmp/packages
-            cp ~/SmartPeak_build/*.deb /tmp/packages
-      - store_artifacts:
-          path: /tmp/packages
-
   build_windows:
     working_directory: ~/SmartPeak
     executor: win/default
@@ -216,12 +150,6 @@ workflows:
   version: 2.1
   build:
     jobs:
-      - build_ubuntu:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only: /.*/
       - build_windows:
           filters:
             tags:
@@ -230,7 +158,6 @@ workflows:
               only: /.*/
       - publish_release:
           requires:
-            - build_ubuntu
             - build_windows
           filters:
             tags:
