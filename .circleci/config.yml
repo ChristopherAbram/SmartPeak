@@ -70,63 +70,6 @@ jobs:
       - store_artifacts:
           path: /tmp/packages
 
-  build_macos:
-    macos:
-      xcode: "11.2.1"
-    working_directory: ~/SmartPeak
-    steps:
-      - checkout
-      - run: brew remove yarn node
-      - run: brew install cmake qt5 sdl2
-      - run: brew install boost
-      - run: |
-          set +o pipefail
-          # brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
-      - run: |
-          set -o pipefail
-          # brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi || true
-      - run: |
-          cd ~ &&
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          cd OpenMS && mkdir contrib_build && cd contrib_build
-          curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
-          tar -xzf contrib_build.tar.gz
-          rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
-          cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
-          make -j4 OpenMS
-      - run: |
-          cd ~/SmartPeak
-          #mkdir superbuild
-          mkdir smartpeak_debug_build
-          cd superbuild
-          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
-          cd ../smartpeak_debug_build
-          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
-          make -j4
-      - run: |
-          set +o pipefail
-          cd ~/SmartPeak/smartpeak_debug_build
-          ctest -VV -F --timeout 1200 || true
-      - run: | 
-          set +e
-          cd ~/SmartPeak/smartpeak_debug_build
-          ls -alt bin
-          cpack -G DragNDrop && ls -alth
-          yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
-          otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
-          cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
-          xattr -l GUI.app/*
-          sudo xattr -dr com.apple.quarantine GUI.app
-          # open GUI.app
-      - run:
-          command: |
-            mkdir -p /tmp/artifacts
-            cp ~/SmartPeak/smartpeak_debug_build/*.dmg /tmp/artifacts
-      - store_artifacts:
-          path: /tmp/artifacts
-
-
   build_windows:
     working_directory: ~/SmartPeak
     executor: win/default
@@ -285,17 +228,10 @@ workflows:
               only: /.*/
             branches:
               only: /.*/
-      - build_macos:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only: /.*/
       - publish_release:
           requires:
             - build_ubuntu
             - build_windows
-            - build_macos
           filters:
             tags:
               only: /.*/
