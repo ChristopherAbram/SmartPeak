@@ -27,7 +27,7 @@ jobs:
       - attach_workspace:
           at: /tmp/artifacts
       - swissknife/get-job-number:
-          job-name: build_ubuntu
+          job-name: "build_ubuntu"
       - run:
           name: "Publish Release on GitHub"
           command: |
