@@ -37,11 +37,13 @@ jobs:
               --header "Circle-Token: ${CIRCLE_TOKEN}" \
               --header 'content-type: application/json')
             JOB_NUMBERS=$(echo $JOB_NUMBERS_CONTENT | jq -r '.items[] | select (.type? == "build") | .job_number')
-            echo "Found job IDs in current workflow: $JOB_NUMBERS"
+            echo $JOB_NUMBERS | tr " " "\n" > job_num.txt
+            echo "Found job IDs in current workflow"
+            cat job_num.txt
 
             # Get artifacts per each job:
             echo "Searching for Artifacts .........."
-            for x in JOB_NUMBERS ; do 
+            for x in $JOB_NUMBERS ; do 
               ART_CONTENT=$(curl --request GET \
                 --url "https://circleci.com/api/v2/project/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/$x/artifacts" \
                 --header "Circle-Token: ${CIRCLE_TOKEN}" \
