@@ -4,7 +4,7 @@ orbs:
   win: circleci/windows@2.4.0
 
 jobs:
-  build_ubuntu:
+  build_ubuntu_1:
     docker:
       - image: ubuntu:20.04
     working_directory: ~/SmartPeak
@@ -14,7 +14,22 @@ jobs:
           echo ${CIRCLE_WORKFLOW_ID}
           apt-get update
           apt-get install curl -y
-          curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile
+          curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile1
+          cp tmpfile /tmp/artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
+
+  build_ubuntu_2:
+    docker:
+      - image: ubuntu:20.04
+    working_directory: ~/SmartPeak
+    steps:
+      - checkout
+      - run: |
+          echo ${CIRCLE_WORKFLOW_ID}
+          apt-get update
+          apt-get install curl -y
+          curl https://docs.readthedocs.io/en/stable/versions.html > tmpfile2
           cp tmpfile /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
@@ -49,9 +64,9 @@ jobs:
                 --header "Circle-Token: ${CIRCLE_TOKEN}" \
                 --header 'content-type: application/json') 
               ARTS=$(echo $ART_CONTENT | jq -r '.items[] | .url')
-              echo 
               echo "*** Artifacts For Job Number $x ***"
               echo $ARTS
+              wget -P arts --verbose --header "Circle-Token: ${CIRCLE_TOKEN}" $ARTS
               echo 
             done
 
@@ -59,7 +74,13 @@ workflows:
   version: 2.1
   build:
     jobs:
-      - build_ubuntu:
+      - build_ubuntu_1:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
+      - build_ubuntu_2:
           filters:
             tags:
               only: /.*/
@@ -67,7 +88,8 @@ workflows:
               only: /.*/
       - publish_release:
           requires:
-            - build_ubuntu
+            - build_ubuntu_1
+            - build_ubuntu_2
           filters:
             tags:
               only: /.*/
