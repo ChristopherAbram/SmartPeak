@@ -57,12 +57,18 @@ jobs:
             cat job_num.txt
 
             # Get artifacts per each job:
+            echo "Current job: ${CIRCLE_BUILD_NUM}"
             echo "Searching for Artifacts .........."
             for x in $JOB_NUMBERS ; do 
+              if [[ "$x" == "$CIRCLE_BUILD_NUM" ]]; then
+                continue
+              fi
               ART_CONTENT=$(curl --request GET \
                 --url "https://circleci.com/api/v2/project/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/$x/artifacts" \
                 --header "Circle-Token: ${CIRCLE_TOKEN}" \
                 --header 'content-type: application/json') 
+              echo $ART_CONTENT
+              echo 
               ARTS=$(echo $ART_CONTENT | jq -r '.items[] | .url')
               echo "*** Artifacts For Job Number $x ***"
               echo $ARTS
