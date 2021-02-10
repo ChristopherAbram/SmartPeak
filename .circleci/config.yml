@@ -76,6 +76,9 @@ jobs:
               echo 
             done
 
+            echo "Push artifacts to github tag"
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} arts
+
 workflows:
   version: 2.1
   build:
