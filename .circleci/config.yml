@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   win: circleci/windows@2.4.0
-  swissknife: roopakv/swissknife@0.54.0
 
 jobs:
   build_ubuntu:
@@ -26,8 +25,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/artifacts
-      - swissknife/get-job-number:
-          job-name: "build_ubuntu"
       - run:
           name: "Publish Release on GitHub"
           command: |
