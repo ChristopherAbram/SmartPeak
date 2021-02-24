@@ -56,6 +56,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "Check prerequisites"
+          command: |
+            python --version
+            pip install gitpython
+      - run:
           name: "Publish Release on GitHub"
           command: |
             echo "Branch name: ${CIRCLE_BRANCH}"
@@ -63,13 +68,11 @@ jobs:
             VERSION=${BRANCH[1]}
             echo "Release tag: ${VERSION}"
             echo
-            echo $PWD
             ls -la
-            python --version
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             
-            python ./tools/smartpeak/smartpeak_version
+            python smartpeak_version
             
             
   publish_release:
