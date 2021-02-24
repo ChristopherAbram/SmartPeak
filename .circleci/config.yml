@@ -171,8 +171,15 @@ jobs:
       - run:
           name: "Auto-merge release branch"
           command: |
-            echo "Merge"
-            git --help
+            git config --global user.email "krzyja@biosustain.dtu.dk"
+            git config --global user.name "ChristopherAbram"
+            git clone https://github.com/ChristopherAbram/SmartPeak.git .
+            git checkout develop
+            git log -1 --oneline
+            git fetch origin ${CIRCLE_BRANCH}
+            git merge ${CIRCLE_BRANCH}
+            git status
+            git push origin develop
 
 workflows:
   version: 2.1
