@@ -52,9 +52,14 @@ jobs:
   prepare_release:
     working_directory: ~/SmartPeak
     docker:
-      - image: python
+      - image: python:3.7.0
     steps:
       - checkout
+      - run:
+          name: "Check prerequisites"
+          command: |
+            python --version
+            pip install gcg gitpython
       - run:
           name: "Publish Release on GitHub"
           command: |
@@ -63,13 +68,11 @@ jobs:
             VERSION=${BRANCH[1]}
             echo "Release tag: ${VERSION}"
             echo
-            echo $PWD
             ls -la
-            python --version
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             
-            python ./tools/smartpeak/smartpeak_version
+            smartpeak_version
             
             
   publish_release:
