@@ -51,7 +51,7 @@ jobs:
 
   prepare_release:
     docker:
-      - image: cibuilds/github:0.10
+      - image: ubuntu:20.04
     steps:
       - checkout
       - run:
