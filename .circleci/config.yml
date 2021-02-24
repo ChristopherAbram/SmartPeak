@@ -179,7 +179,6 @@ jobs:
             git clone https://github.com/ChristopherAbram/SmartPeak.git sp
             cd sp
             git checkout develop
-            git log -1 --oneline
             git fetch origin ${CIRCLE_BRANCH}
             git merge ${CIRCLE_BRANCH} --no-ff --no-edit
             git status
