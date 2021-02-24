@@ -13,6 +13,8 @@ jobs:
       - run:
           name: Packing SmartPeak
           command: |
+            apt-get update
+            apt-get install -y curl
             curl http://manpages.ubuntu.com/manpages/trusty/man1/mktemp.1.html > SmartPeak-1.0.0-Linux.deb
             mkdir -p /tmp/packages
             cp SmartPeak-1.0.0-Linux.deb /tmp/packages
@@ -28,6 +30,8 @@ jobs:
       - run:
           name: Moving Package to artifacts folder
           command: |
+            apt-get update
+            apt-get install -y curl
             curl http://manpages.ubuntu.com/manpages/trusty/man1/mktemp.1.html > SmartPeak-1.0.0-Darwin.dmg
             mkdir -p /tmp/packages
             cp SmartPeak-1.0.0-Darwin.dmg /tmp/packages
@@ -77,8 +81,11 @@ jobs:
       - run:
           name: "Push release branch"
           command: |
-            git --help
-            
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
+            git status
+            git commit -am "Release update (${VERSION}) [skip ci]"
+            git push origin ${CIRCLE_BRANCH}
             
   publish_release:
     docker:
