@@ -50,6 +50,7 @@ jobs:
           path: ~/artifacts
 
   prepare_release:
+    working_directory: ~/SmartPeak
     docker:
       - image: python
     steps:
