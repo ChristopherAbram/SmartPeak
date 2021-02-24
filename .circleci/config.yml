@@ -127,7 +127,7 @@ workflows:
       - prepare_release:
           filters:
             branches:
-              only: /^release\\/.*$/
+              only: /^release\/.*$/
       # - build_ubuntu:
       #     filters:
       #       branches:
