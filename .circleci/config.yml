@@ -4,7 +4,7 @@ orbs:
   win: circleci/windows@2.4.0
 
 # Fetch artifacts only for these jobs with not empty artifact list (now it fails)
-# Create checkout command
+# Create checkout command (after push onother jobs pulls previous commit ...)
 # Retrieve changelog description for current release and push it to github release
 
 jobs:
@@ -13,16 +13,20 @@ jobs:
       - image: ubuntu:20.04
     working_directory: ~/SmartPeak
     steps:
+      - checkout
       - run:
-          name: Checkout
+          name: Prerequisites
           command: |
-            git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
-            git log -1 --oneline
+            apt-get update
+            apt-get install -y curl git
+      # - run:
+      #     name: Checkout
+      #     command: |
+      #       git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
+      #       git log -1 --oneline
       - run:
           name: Packing SmartPeak
           command: |
-            apt-get update
-            apt-get install -y curl
             curl http://manpages.ubuntu.com/manpages/trusty/man1/mktemp.1.html > SmartPeak-1.0.0-Linux.deb
             mkdir -p /tmp/packages
             cp SmartPeak-1.0.0-Linux.deb /tmp/packages
@@ -34,16 +38,20 @@ jobs:
       - image: ubuntu:20.04
     working_directory: ~/SmartPeak
     steps:
+      - checkout
       - run:
-          name: Checkout
+          name: Prerequisites
           command: |
-            git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
-            git log -1 --oneline
+            apt-get update
+            apt-get install -y curl git
+      # - run:
+      #     name: Checkout
+      #     command: |
+      #       git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
+      #       git log -1 --oneline
       - run:
           name: Moving Package to artifacts folder
           command: |
-            apt-get update
-            apt-get install -y curl
             ls -la
             curl http://manpages.ubuntu.com/manpages/trusty/man1/mktemp.1.html > SmartPeak-1.0.0-Darwin.dmg
             mkdir -p /tmp/packages
@@ -55,11 +63,12 @@ jobs:
     working_directory: ~/SmartPeak
     executor: win/default
     steps:
-      - run:
-          name: Checkout
-          command: |
-            git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
-            git log -1 --oneline
+      - checkout
+      # - run:
+      #     name: Checkout
+      #     command: |
+      #       git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
+      #       git log -1 --oneline
       - run: systeminfo
       - run:
           name: Preparing Artifact
