@@ -120,8 +120,6 @@ jobs:
       - image: python:3.7.0
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: /tmp/artifacts
       - run:
           name: "Install prerequisites"
           command: |
@@ -192,7 +190,10 @@ jobs:
           command: |
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "v${VERSION}" arts
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+            RELEASE_BODY=$(smartpeak_changes)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
 
 workflows:
   version: 2.1
