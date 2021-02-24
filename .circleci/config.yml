@@ -125,6 +125,7 @@ jobs:
           command: |
             apt-get update
             apt-get install -y curl wget jq
+            pip install gitpython
             GHR_VERSION=0.13.0
             GHR_URL=https://github.com/tcnksm/ghr/releases/download/v${GHR_VERSION}/ghr_v${GHR_VERSION}_linux_amd64.tar.gz
             wget "$GHR_URL" && \
