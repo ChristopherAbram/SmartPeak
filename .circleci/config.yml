@@ -3,8 +3,8 @@ version: 2.1
 orbs:
   win: circleci/windows@2.4.0
 
-# Create checkout command (after push onother jobs pulls previous commit ...)
-# Retrieve changelog description for current release and push it to github release
+# Create checkout command (after push from another jobs pulls previous commit ...) or pull only on release
+# Integrate CI
 
 jobs:
   build_ubuntu:
@@ -98,7 +98,6 @@ jobs:
             echo "Release tag: ${VERSION}"
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
-            
             smartpeak_prepare_release --set-version=${VERSION}
       - add_ssh_keys:
           fingerprints:
@@ -198,11 +197,20 @@ jobs:
 
 workflows:
   version: 2.1
-  # ci:
-  #   jobs:
-  #     - build_ubuntu
-  #     - build_macos
-  #     - build_windows
+  ci:
+    jobs:
+      - build_ubuntu:
+          filters:
+            branches:
+              ignore: /^release\/.*$/
+      - build_macos:
+          filters:
+            branches:
+              ignore: /^release\/.*$/
+      - build_windows:
+          filters:
+            branches:
+              ignore: /^release\/.*$/
   release:
     jobs:
       - prepare_release:
