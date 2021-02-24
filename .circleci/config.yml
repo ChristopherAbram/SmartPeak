@@ -135,6 +135,7 @@ jobs:
               if [[ "$x" == "$CIRCLE_BUILD_NUM" ]]; then
                 continue
               fi
+              echo "Get artifacts for job ${x}"
               ART_CONTENT=$(curl --request GET \
                 --url "https://circleci.com/api/v2/project/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/$x/artifacts" \
                 --header "Circle-Token: ${CIRCLE_TOKEN}" \
@@ -142,9 +143,14 @@ jobs:
               echo $ART_CONTENT
               echo 
               ARTS=$(echo $ART_CONTENT | jq -r '.items[] | .url')
-              echo "*** Artifacts For Job Number $x ***"
-              echo $ARTS
-              wget -P arts --verbose --header "Circle-Token: ${CIRCLE_TOKEN}" $ARTS
+              # echo "*** Artifacts For Job Number $x ***"
+              echo "Detected following url: $ARTS"
+              if [ ! -z "$ARTS" ]; then 
+                echo "Download from url: ${ARTS}"
+                wget -P arts --verbose --header "Circle-Token: ${CIRCLE_TOKEN}" $ARTS
+              else
+                echo "Skip download for #${x}"
+              fi
               echo 
             done
       - run:
