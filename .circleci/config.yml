@@ -3,13 +3,21 @@ version: 2.1
 orbs:
   win: circleci/windows@2.4.0
 
+# Fetch artifacts only for these jobs with not empty artifact list (now it fails)
+# Create checkout command
+# Retrieve changelog description for current release and push it to github release
+
 jobs:
   build_ubuntu:
     docker:
       - image: ubuntu:20.04
     working_directory: ~/SmartPeak
     steps:
-      - checkout
+      - run:
+          name: Checkout
+          command: |
+            git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
+            git log -1 --oneline
       - run:
           name: Packing SmartPeak
           command: |
@@ -26,12 +34,17 @@ jobs:
       - image: ubuntu:20.04
     working_directory: ~/SmartPeak
     steps:
-      - checkout
+      - run:
+          name: Checkout
+          command: |
+            git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
+            git log -1 --oneline
       - run:
           name: Moving Package to artifacts folder
           command: |
             apt-get update
             apt-get install -y curl
+            ls -la
             curl http://manpages.ubuntu.com/manpages/trusty/man1/mktemp.1.html > SmartPeak-1.0.0-Darwin.dmg
             mkdir -p /tmp/packages
             cp SmartPeak-1.0.0-Darwin.dmg /tmp/packages
@@ -42,7 +55,11 @@ jobs:
     working_directory: ~/SmartPeak
     executor: win/default
     steps:
-      - checkout
+      - run:
+          name: Checkout
+          command: |
+            git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
+            git log -1 --oneline
       - run: systeminfo
       - run:
           name: Preparing Artifact
@@ -90,20 +107,18 @@ jobs:
             git push origin ${CIRCLE_BRANCH}
             
   publish_release:
+    working_directory: ~/SmartPeak
     docker:
       - image: cibuilds/github:0.10
     steps:
-      - attach_workspace:
-          at: /tmp/artifacts
+      # - attach_workspace:
+      #     at: /tmp/artifacts
       - run:
-          name: "Publish Release on GitHub"
+          name: "Retrieve artifacts"
           command: |
-            BRANCH=(${CIRCLE_BRANCH//// })
-            VERSION=${BRANCH[1]}
             mkdir arts
-            git --help
 
-            # Get all job numbers for this workflow:
+            # Get all job numbers for this workflow: 
             JOB_NUMBERS_CONTENT=$(curl --request GET \
               --url "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/job" \
               --header "Circle-Token: ${CIRCLE_TOKEN}" \
@@ -132,9 +147,17 @@ jobs:
               wget -P arts --verbose --header "Circle-Token: ${CIRCLE_TOKEN}" $ARTS
               echo 
             done
-
-            echo "Push artifacts to github tag"
+      - run:
+          name: "Publish release to github"
+          command: |
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} arts
+      - run:
+          name: "Auto-merge release branch"
+          command: |
+            echo "Merge"
+            git --help
 
 workflows:
   version: 2.1
