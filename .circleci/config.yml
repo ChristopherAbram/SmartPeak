@@ -170,9 +170,10 @@ jobs:
           command: |
             git config --global user.email "krzyja@biosustain.dtu.dk"
             git config --global user.name "ChristopherAbram"
-            git clone https://github.com/ChristopherAbram/SmartPeak.git smartpeak
+            git clone -b develop https://github.com/ChristopherAbram/SmartPeak.git smartpeak
             cd smartpeak
-            git fetch origin ${CIRCLE_BRANCH}
+            # git fetch origin ${CIRCLE_BRANCH}
+            git pull origin ${CIRCLE_BRANCH}
             git branch
             git merge ${CIRCLE_BRANCH} --no-edit
             git push origin develop
