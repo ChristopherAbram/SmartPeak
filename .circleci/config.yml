@@ -166,23 +166,22 @@ jobs:
           fingerprints:
             - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
       - run:
+          name: "Auto-merge release branch"
+          command: |
+            git config --global user.email "krzyja@biosustain.dtu.dk"
+            git config --global user.name "ChristopherAbram"
+            git clone https://github.com/ChristopherAbram/SmartPeak.git smartpeak
+            cd smartpeak
+            git fetch origin ${CIRCLE_BRANCH}
+            git branch
+            git merge ${CIRCLE_BRANCH} --no-edit
+            git push origin develop
+      - run:
           name: "Publish release to github"
           command: |
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} arts
-      - run:
-          name: "Auto-merge release branch"
-          command: |
-            git config --global user.email "krzyja@biosustain.dtu.dk"
-            git config --global user.name "ChristopherAbram"
-            git clone https://github.com/ChristopherAbram/SmartPeak.git sp
-            cd sp
-            git checkout develop
-            git fetch origin ${CIRCLE_BRANCH}
-            git merge ${CIRCLE_BRANCH} --no-edit
-            git status
-            git push origin develop
 
 workflows:
   version: 2.1
