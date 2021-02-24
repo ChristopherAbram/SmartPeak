@@ -2,6 +2,21 @@ SmartPeak Changelog
 ===================
 
 
+v1.2.3 (2021-02-24)
+-------------------
+
+Features
+~~~~~~~~
+- [feat/aut819] Implement version bumper + Add script which returns
+  version after bumping (dry mode) + Update utils.py file with
+  bumped_version() function. [ChristopherAbram]
+- [feat/aut819] Implement version bumper + Provide script for reading
+  and updating smartpeak version from CMake configuration (smartpeak
+  tool python package) + Provide scripts for bumping/setting smartpeak
+  version from commit message + Update smartpeak version to the latest
+  released. [ChristopherAbram]
+
+
 v1.2.0 (2021-02-24)
 -------------------
 
