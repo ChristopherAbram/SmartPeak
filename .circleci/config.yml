@@ -59,6 +59,7 @@ jobs:
           name: "Check prerequisites"
           command: |
             python --version
+            apt-get update
             apt-get install -y python3-git
       - run:
           name: "Publish Release on GitHub"
