@@ -78,16 +78,20 @@ def get_new_version(set_version, bump, current_version):
       a, b, c = ver_check.groups()
       n_major, n_minor, n_patch = int(a), int(b), int(c)
   else:
-    bump = bump
-    n_major, n_minor, n_patch = major, minor, patch
-    if bump == 'major':
-      n_major += 1
-    elif bump == 'minor':
-      n_minor += 1
-    elif bump == 'patch':
-      n_patch += 1
+    n_major, n_minor, n_patch = bumped_version(bump, current_version)
 
   return True, (n_major, n_minor, n_patch)
+
+def bumped_version(bump, current_version):
+  major, minor, patch = current_version
+  n_major, n_minor, n_patch = major, minor, patch
+  if bump == 'major':
+    n_major += 1
+  elif bump == 'minor':
+    n_minor += 1
+  elif bump == 'patch':
+    n_patch += 1
+  return n_major, n_minor, n_patch
 
 def get_release_command_pattern():
     return r'\(\s*release\s*(((bump)\s*(major|minor|patch))|((set)\s*v?(([0-9]+)\.([0-9]+)\.([0-9]+))))\s*\)'
