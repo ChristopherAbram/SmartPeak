@@ -51,7 +51,7 @@ jobs:
 
   prepare_release:
     docker:
-      - image: ubuntu:20.04
+      - image: python
     steps:
       - checkout
       - run:
