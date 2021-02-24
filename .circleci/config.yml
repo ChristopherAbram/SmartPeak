@@ -73,7 +73,7 @@ jobs:
             smartpeak_prepare_release --set-version=${VERSION}
       - add_ssh_keys:
           fingerprints:
-            - "af:ba:8c:dc:ed:b1:80:2e:6b:c7:72:74:2f:3a:1c:40"
+            - "80:c7:e7:dd:cf:9c:83:54:d9:2b:0d:3d:2c:ea:a4:f5"
       - run:
           name: "Push release branch"
           command: |
