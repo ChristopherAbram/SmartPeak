@@ -59,7 +59,7 @@ jobs:
           name: "Check prerequisites"
           command: |
             python --version
-            pip install gitpython
+            pip install --user gitpython
       - run:
           name: "Publish Release on GitHub"
           command: |
