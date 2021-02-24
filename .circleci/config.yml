@@ -59,6 +59,7 @@ jobs:
           name: "Check prerequisites"
           command: |
             python --version
+            pip install gcg gitpython
       - run:
           name: "Publish Release on GitHub"
           command: |
@@ -70,7 +71,6 @@ jobs:
             ls -la
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
-            pip3 install gitpython
             
             smartpeak_version
             
