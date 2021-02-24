@@ -101,6 +101,7 @@ jobs:
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
             mkdir arts
+            git --help
 
             # Get all job numbers for this workflow:
             JOB_NUMBERS_CONTENT=$(curl --request GET \
@@ -151,28 +152,14 @@ workflows:
       - build_ubuntu:
           requires:
             - prepare_release
-          filters:
-            branches:
-              only: /^release\/.*$/
       - build_macos:
           requires:
             - prepare_release
-          filters:
-            branches:
-              only: /^release\/.*$/
       - build_windows:
           requires:
             - prepare_release
-          filters:
-            branches:
-              only: /^release\/.*$/
       - publish_release:
           requires:
             - build_ubuntu
             - build_macos
             - build_windows
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
