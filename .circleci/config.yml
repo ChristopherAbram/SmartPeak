@@ -61,18 +61,23 @@ jobs:
             python --version
             pip install gitpython
       - run:
-          name: "Publish Release on GitHub"
+          name: "Update SmartPeak version"
           command: |
             echo "Branch name: ${CIRCLE_BRANCH}"
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
             echo "Release tag: ${VERSION}"
-            echo
-            ls -la
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             
-            smartpeak_version
+            smartpeak_prepare_release --set-version=${VERSION}
+      - add_ssh_keys:
+          fingerprints:
+            - "af:ba:8c:dc:ed:b1:80:2e:6b:c7:72:74:2f:3a:1c:40"
+      - run:
+          name: "Push release branch"
+          command: |
+            git --help
             
             
   publish_release:
@@ -84,7 +89,8 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=${CIRCLE_TAG}
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
             mkdir arts
 
             # Get all job numbers for this workflow:
@@ -133,15 +139,31 @@ workflows:
           filters:
             branches:
               only: /^release\/.*$/
-      # - build_ubuntu:
-      #     filters:
-      #       branches:
-      #         only: /^release\\/.*$/
-      # - publish_release:
-      #     requires:
-      #       - build_ubuntu
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
+      - build_ubuntu:
+          requires:
+            - prepare_release
+          filters:
+            branches:
+              only: /^release\/.*$/
+      - build_macos:
+          requires:
+            - prepare_release
+          filters:
+            branches:
+              only: /^release\/.*$/
+      - build_windows:
+          requires:
+            - prepare_release
+          filters:
+            branches:
+              only: /^release\/.*$/
+      - publish_release:
+          requires:
+            - build_ubuntu
+            - build_macos
+            - build_windows
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
