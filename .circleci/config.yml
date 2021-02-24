@@ -72,7 +72,7 @@ jobs:
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             
-            python smartpeak_version
+            smartpeak_version
             
             
   publish_release:
