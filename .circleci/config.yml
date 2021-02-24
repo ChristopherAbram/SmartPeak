@@ -180,7 +180,7 @@ jobs:
             cd sp
             git checkout develop
             git fetch origin ${CIRCLE_BRANCH}
-            git merge ${CIRCLE_BRANCH} --no-ff --no-edit
+            git merge ${CIRCLE_BRANCH} --no-edit
             git status
             git push origin develop
 
