@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os, sys, re
+from pathlib import Path
 import git
 
 
@@ -109,3 +110,31 @@ def is_release_command_present(message):
 def get_latest_commit_message():
   repo = git.Repo(get_project_path())
   return repo.head.commit.message
+
+def read_changes(filepath, version):
+  pattern = r'''(?ismx)
+^(v?[0-9]+\.[0-9]+(?:\.[0-9]+)?[a-z]*)\s+\([0-9]+-[0-9]{2}-[0-9]{2}\)(?:\n|\r\n|\r)
+--+(?:\n|\r\n|\r)
+\s*(.*?)
+(?=(?:v?[0-9]+\.[0-9]+(?:\.[0-9]+)?[a-z]*)\s+\([0-9]+-[0-9]{2}-[0-9]{2}\)(?:\n|\r\n|\r)
+--+(?:\n|\r\n|\r)|\Z)'''
+
+  with open(filepath, 'r') as changelog:
+    lines = changelog.read()
+    f = re.findall(pattern, lines)
+    if f:
+      for results in f:
+        tag = results[0]
+        content = results[1]
+        if tag == version or version == 'latest':
+          return content
+  return None
+
+def preprocess_changes(content):
+  lines = content.rstrip("\n").split('\n')
+  for i, line in enumerate(lines):
+    f = re.findall(r'~~+(?:\n|\r\n|\r)?', lines[i])
+    if f:
+      lines[i - 1] = '# ' + lines[i - 1]
+      del lines[i]
+  return '\n'.join(lines)
