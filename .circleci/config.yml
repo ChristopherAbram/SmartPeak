@@ -4,7 +4,6 @@ orbs:
   win: circleci/windows@2.4.0
 
 # Create checkout command (after push from another jobs pulls previous commit ...) or pull only on release
-# Integrate CI
 
 jobs:
   build_ubuntu:
@@ -18,11 +17,17 @@ jobs:
           command: |
             apt-get update
             apt-get install -y curl git
-      # - run:
-      #     name: Checkout
-      #     command: |
-      #       git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
-      #       git log -1 --oneline
+      - run:
+          name: "Pull latest"
+          command: |
+            # CircleCI doesn't support regex for conditional steps...
+            if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
+                git checkout ${CIRCLE_BRANCH}
+                git pull origin ${CIRCLE_BRANCH}
+                git log -1 --oneline
+            else
+              echo "Skip this run step"
+            fi
       - run:
           name: Packing SmartPeak
           command: |
@@ -43,11 +48,17 @@ jobs:
           command: |
             apt-get update
             apt-get install -y curl git
-      # - run:
-      #     name: Checkout
-      #     command: |
-      #       git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
-      #       git log -1 --oneline
+      - run:
+          name: "Pull latest"
+          command: |
+            # CircleCI doesn't support regex for conditional steps...
+            if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
+                git checkout ${CIRCLE_BRANCH}
+                git pull origin ${CIRCLE_BRANCH}
+                git log -1 --oneline
+            else
+              echo "Skip this run step"
+            fi
       - run:
           name: Moving Package to artifacts folder
           command: |
@@ -63,11 +74,16 @@ jobs:
     executor: win/default
     steps:
       - checkout
-      # - run:
-      #     name: Checkout
-      #     command: |
-      #       git clone -b ${CIRCLE_BRANCH} https://github.com/ChristopherAbram/SmartPeak.git .
-      #       git log -1 --oneline
+      - run:
+          name: "Pull latest"
+          command: |
+            if (<< pipeline.git.branch >> -match '^release/.*$') {
+              git checkout ${CIRCLE_BRANCH}
+              git pull origin ${CIRCLE_BRANCH}
+              git log -1 --oneline
+            } else {
+              Write-Output "Skip this run step"
+            }
       - run: systeminfo
       - run:
           name: Preparing Artifact
