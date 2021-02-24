@@ -62,9 +62,10 @@ jobs:
             VERSION=${BRANCH[1]}
             echo "Release tag: ${VERSION}"
             echo
+            echo $PWD
             ls -la
             python --version
-            export PATH="$path:$PWD/tools/smartpeak"
+            export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             
             smartpeak_version
