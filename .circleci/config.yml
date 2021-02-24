@@ -59,7 +59,7 @@ jobs:
           name: "Check prerequisites"
           command: |
             python --version
-            pip install gcg gitpython
+            pip install gitpython
       - run:
           name: "Publish Release on GitHub"
           command: |
