@@ -50,6 +50,7 @@ jobs:
           path: ~/artifacts
 
   prepare_release:
+    working_directory: ~/SmartPeak
     docker:
       - image: python
     steps:
@@ -68,7 +69,7 @@ jobs:
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             
-            smartpeak_version
+            python ./tools/smartpeak/smartpeak_version
             
             
   publish_release:
