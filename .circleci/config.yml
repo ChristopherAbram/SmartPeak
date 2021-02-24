@@ -83,6 +83,8 @@ jobs:
           command: |
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
+            git config --global user.email "krzyja@biosustain.dtu.dk"
+            git config --global user.name "ChristopherAbram"
             git status
             git commit -am "Release update (${VERSION}) [skip ci]"
             git push origin ${CIRCLE_BRANCH}
