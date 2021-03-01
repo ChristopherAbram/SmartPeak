@@ -224,26 +224,29 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "SmartPeak *v${SMARTPEAK_VERSION}* released.\n\nhttps://github.com/ChristopherAbram/SmartPeak/releases/latest"
+                    "text": "*SmartPeak v${SMARTPEAK_VERSION}* released"
                   }
                 },
                 {
                   "type": "divider"
                 },
                 {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "Download from GitHub",
-                        "emoji": true
-                      },
-                      "value": "release",
-                      "url": "https://github.com/ChristopherAbram/SmartPeak/releases/latest"
-                    }
-                  ]
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "https://github.com/ChristopherAbram/SmartPeak/releases/tag/v${SMARTPEAK_VERSION}"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Download from GitHub",
+                      "emoji": true
+                    },
+                    "value": "github_releases",
+                    "url": "https://github.com/ChristopherAbram/SmartPeak/releases/tag/v${SMARTPEAK_VERSION}",
+                    "action_id": "button-action"
+                  }
                 }
               ]
             }
