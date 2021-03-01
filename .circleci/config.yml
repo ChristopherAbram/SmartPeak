@@ -207,15 +207,47 @@ jobs:
           command: |
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
+            echo "export SMARTPEAK_VERSION=$VERSION" >> $BASH_ENV
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             RELEASE_BODY=$(smartpeak_changes)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c develop -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
             
       - slack/notify:
-          channel: C01PQK6GP7U
-          event: pass
-          template: basic_fail_1
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "SmartPeak *v${SMARTPEAK_VERSION}* released.\n\nhttps://github.com/ChristopherAbram/SmartPeak/releases/latest"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Download from GitHub",
+                        "emoji": true
+                      },
+                      "value": "release",
+                      "url": "https://github.com/ChristopherAbram/SmartPeak/releases/latest"
+                    }
+                  ]
+                }
+              ]
+            }
+          event: always
 
   trigger_release:
     working_directory: ~/SmartPeak
