@@ -268,7 +268,7 @@ workflows:
       - trigger_release:
           filters:
             branches:
-              ignore: develop
+              only: develop
   release:
     jobs:
       - prepare_release:
