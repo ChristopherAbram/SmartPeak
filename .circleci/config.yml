@@ -211,6 +211,42 @@ jobs:
             RELEASE_BODY=$(smartpeak_changes)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
 
+  trigger_release:
+    working_directory: ~/SmartPeak
+    docker:
+      - image: python:3.7.0
+    steps:
+      - checkout
+      - run:
+          name: "Install prerequisites"
+          command: |
+            apt-get update
+            pip install gitpython
+      - add_ssh_keys:
+          fingerprints:
+            - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
+      - run:
+          name: "Verify commit"
+          command: |
+            # Parse latest commit message:
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+            RELEASE_AVAILABLE=$(smartpeak_git_release_available)
+            # If smartpeak_git_release_available outputs anything, there is a valid release string included
+            if [ ! -z "${RELEASE_AVAILABLE}" ]; then
+              # Retrieve version:  
+              split=(${RELEASE_AVAILABLE})
+              VERSION=${split[2]}
+              # Push release branch:
+              git config --global user.email "krzyja@biosustain.dtu.dk"
+              git config --global user.name "ChristopherAbram"
+              git checkout -b release/${VERSION}
+              git push origin release/${VERSION}
+              echo "The new branch release/${VERSION} pushed!"
+            else
+              echo "No release command detected. Exit."
+            fi
+
 workflows:
   version: 2.1
   ci:
@@ -227,6 +263,12 @@ workflows:
           filters:
             branches:
               ignore: /^release\/.*$/
+  release_check:
+    jobs:
+      - trigger_release:
+          filters:
+            branches:
+              ignore: develop
   release:
     jobs:
       - prepare_release:
