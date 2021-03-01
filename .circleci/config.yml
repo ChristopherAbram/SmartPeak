@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   win: circleci/windows@2.4.0
+  slack: circleci/slack@4.3.0
 
 # Create checkout command (after push from another jobs pulls previous commit ...) or pull only on release
 
@@ -210,6 +211,11 @@ jobs:
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             RELEASE_BODY=$(smartpeak_changes)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c develop -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
+            
+      - slack/notify:
+          channel: C01PQK6GP7U
+          event: pass
+          template: basic_fail_1
 
   trigger_release:
     working_directory: ~/SmartPeak
@@ -289,3 +295,5 @@ workflows:
             - build_ubuntu
             - build_macos
             - build_windows
+          context:
+            - smartpeak-slack
