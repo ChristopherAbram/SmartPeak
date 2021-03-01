@@ -1,13 +1,39 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, re
 import smartpeak.utils as utils
 
 
 def main(argc, argv):
     latest = utils.get_latest_commit_message()
+    # latest = '''
+    # [feat/aut819] Implement version bumper
+    # + Add script which (release bump minor) returns version after bumping (dry mode)
+    # + Update utils.py file with bumped_version() function
+    # '''
     type, value = utils.is_release_command_present(latest)
     if type and value:
-        print(type + ' ' + value, end='')
+        set_version = value if type == 'set' else 'None'
+        value = 'version' if type == 'set' else value
+        bump = value if type == 'bump' else 'patch'
+
+        # Read current version:
+        config_file = os.path.join(utils.get_project_path(), 'CMakeLists.txt')
+        major, minor, patch = utils.get_version(config_file)
+
+        # Retrieve new version:
+        success, (n_major, n_minor, n_patch) = utils.get_new_version(
+            set_version, bump, (major, minor, patch))
+
+        # On failure don't output anything, return success
+        if not success:
+            return 0
+
+        if utils.compare_version((n_major, n_minor, n_patch), (major, minor, patch)) < 0:
+            return 0
+        
+        version = '%d.%d.%d' % (n_major, n_minor, n_patch)
+        print(type + ' ' + value + ' ' + version, end='')
     return 0
 
 

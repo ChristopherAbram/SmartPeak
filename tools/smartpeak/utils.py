@@ -1,6 +1,5 @@
 from __future__ import print_function
 import os, sys, re
-from pathlib import Path
 import git
 
 

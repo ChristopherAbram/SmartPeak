@@ -7,7 +7,9 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
-remote='krza'
+remote='ssh'
+
+echo -e "\nWelcome to the SmartPeak release script\n\n"
 ################################################
 ##                Prerequisites               ##
 ################################################
@@ -38,6 +40,15 @@ fi
 which gitchangelog &> /dev/null
 if [ $? -ne 0 ]; then
     echo -e "${YELLOW}WARNING: 'gitchangelog' not found, enter 'pip install --user gitchangelog' to continue${NC}"
+    exit 2
+fi
+echo -e "${YELLOW}Pull develop branch to ensure release consistance.${NC}"
+# make sure develop is fresh
+if git rev-parse --verify develop &> /dev/null; then
+    git checkout develop
+    git pull $remote develop
+else
+    echo -e "${RED}Your local repository does not have 'develop' branch${NC}"
     exit 2
 fi
 ################################################
@@ -86,13 +97,6 @@ echo -e "${YELLOW}Checkout to 'release/${version}' branch.${NC}"
 remote_exists=`git ls-remote --heads $remote release/${version} | wc -l`
 if [ $remote_exists -eq 0 ]; then
     # if does not exists
-    if git rev-parse --verify develop &> /dev/null; then
-        git checkout develop
-        # git pull $remote develop # TODO
-    else
-        echo -e "${RED}Your local repository does not have 'develop' branch${NC}"
-        exit 2
-    fi
     if git rev-parse --verify release/${version} &> /dev/null; then
         # Remove existing local branch - prevents from wrong updates of changelog
         git branch -D release/${version}
@@ -171,31 +175,29 @@ if [ "$do_update" = "Y" ] || [ "$do_update" = "y" ]; then
     echo "Finished editing CHANGELOG.rst"
 fi
 ################################################
-##            Update Configuration            ##
-################################################
-echo -e "${YELLOW}Update CMakeLists.txt with release version $version...${NC}"
-echo "Local script will modify version embedded in CMakeLists.txt file."
-smartpeak_prepare_release --set-version $version
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Version updated successfully.${NC}"
-else
-    echo -e "${RED}Error occurred while updating configuration file.${NC}"
-    exit 1
-fi
-exit 0
-################################################
 ##              Commit and Push               ##
 ################################################
 sleep 1
-git add CHANGELOG.rst CMakeLists.txt
+echo "Following modifications will be added:"
+git add CHANGELOG.rst
 git commit -m "Release update ($version)"
-echo -e "${YELLOW}Push 'release/${version}' branch to git repository${NC}"
-git push $remote release/$version
+git diff develop..release/${version}
+echo
+echo -n "Do you want to continue with SmartPeak v${version} release? [Y/n]:"
+read do_continue
+if [ "$do_continue" = "Y" ] || [ "$do_continue" = "y" ]; then
+    echo -e "${YELLOW}Push 'release/${version}' branch to git repository${NC}"
+    git push $remote release/$version
 
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Successfully initiated release.${NC}"
-    exit 0
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Successfully initiated release.${NC}"
+        echo "Good Bye!"
+        exit 0
+    else
+        echo -e "${RED}Error occurred while pushing local changes.${NC}"
+        exit 1
+    fi
 else
-    echo -e "${RED}Error occurred while pushing local changes.${NC}"
-    exit 1
+    echo "Release not finished."
+    echo "Good Bye!"
 fi
