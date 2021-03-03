@@ -118,7 +118,8 @@ jobs:
             smartpeak_prepare_release --set-version=${VERSION}
       - add_ssh_keys:
           fingerprints:
-            - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
+            - "b4:d4:55:7a:65:c3:8f:fd:0f:f8:f3:6f:0f:0a:7d:a7"
+            # - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
       - run:
           name: "Push release branch"
           command: |
@@ -190,7 +191,8 @@ jobs:
             done
       - add_ssh_keys:
           fingerprints:
-            - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
+            - "b4:d4:55:7a:65:c3:8f:fd:0f:f8:f3:6f:0f:0a:7d:a7"
+            # - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
       - run:
           name: "Auto-merge release branch"
           command: |
@@ -260,7 +262,8 @@ jobs:
             pip install gitpython
       - add_ssh_keys:
           fingerprints:
-            - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
+            - "b4:d4:55:7a:65:c3:8f:fd:0f:f8:f3:6f:0f:0a:7d:a7"
+            # - "20:a5:d1:16:81:c4:02:14:89:34:be:07:6a:d2:35:95"
       - run:
           name: "Verify commit"
           command: |
