@@ -4,8 +4,6 @@ orbs:
   win: circleci/windows@2.4.0
   slack: circleci/slack@4.3.0
 
-# Create checkout command (after push from another jobs pulls previous commit ...) or pull only on release
-
 jobs:
   build_ubuntu:
     docker:
