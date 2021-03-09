@@ -76,7 +76,7 @@ def main(argc, argv):
     version = args.version
     # Read current version:
     changelog_file = os.path.join(utils.get_project_path(), 'CHANGELOG.rst')
-    changes = utils.read_changes(changelog_file, 'v' + version)
+    changes = utils.read_changes(changelog_file, 'latest')
 
     # Retrieve new version:
     if changes is None:
