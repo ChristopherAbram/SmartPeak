@@ -229,7 +229,6 @@ jobs:
 
             # Send emails:
             smartpeak_send_emails --version=${VERSION}
-
       # - slack/notify:
       #     custom: |
       #       {
