@@ -7,16 +7,14 @@ import smartpeak.utils as utils
 
 def parse_args(argc, argv):
   parser = argparse.ArgumentParser(
-    description='Runs the commands to bump the version number')
+    description='Bump the package version.')
   parser.add_argument('--set-version', 
     default='None',
-    help='Specify the version tag in form of v{MAJOR}.{MINOR}.{PATCH}, this option overrides bump')
+    help='Specify the version tag in form of v{MAJOR}.{MINOR}.{PATCH}, this option overrides bump.')
   parser.add_argument('--bump', 
     choices=('major', 'minor', 'patch'), 
     default='patch', 
     help='Which part of the version number to bump? Works if set-version is not specified (default: %(default)s)')
-  parser.add_argument('-t', '--tag-prefix', default='v', 
-                      help='Add this prefix to the created release tag')
   return parser.parse_args()
 
 

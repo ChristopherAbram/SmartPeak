@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import os, sys, re
+import os, sys, argparse
+
 import smartpeak.utils as utils
 
 
 def main(argc, argv):
+    parser = argparse.ArgumentParser(
+    description='''Reads the latest git message and if a release command is present it returns one of the following:\r\n
+        set version <version-tag>
+            or
+        bump (major|minor|patch) <bumped-version>
+    In case the command is not present, it returns empty string.''')
+    args = parser.parse_args()
+
     latest = utils.get_latest_commit_message()
-    # latest = '''
-    # [feat/aut819] Implement version bumper
-    # + Add script which (release bump minor) returns version after bumping (dry mode)
-    # + Update utils.py file with bumped_version() function
-    # '''
     type, value = utils.is_release_command_present(latest)
     if type and value:
         set_version = value if type == 'set' else 'None'

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import sys, os, re, argparse
+import sys, os, argparse
 
 import smartpeak.utils as utils
 
 
 def parse_args(argc, argv):
   parser = argparse.ArgumentParser(
-    description='Returns changelog information for specified tag')
+    description='Returns changelog information for specified tag.')
   parser.add_argument('--version', 
     default='latest',
-    help='Specify the version tag')
+    help='The version tag')
   return parser.parse_args()
 
 
@@ -27,7 +27,7 @@ def main(argc, argv):
 
   # Preprocess the content:
   content = utils.preprocess_changes(content)
-      
+  
   print(content)
   return 0
 

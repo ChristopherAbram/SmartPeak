@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import sys, os, re
-import argparse
+import sys, os, argparse
 
 import smartpeak.utils as utils
 
 
 def parse_args(argc, argv):
   parser = argparse.ArgumentParser(
-    description='Runs the commands to bump the version number')
+    description='Returns a bumped version of the package and does not modify configuration.')
   parser.add_argument('--bump', 
     choices=('major', 'minor', 'patch'), 
     default='patch', 
