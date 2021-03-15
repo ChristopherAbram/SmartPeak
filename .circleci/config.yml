@@ -199,7 +199,7 @@ jobs:
             git checkout ${CIRCLE_BRANCH}
             git pull origin ${CIRCLE_BRANCH}
             echo ${SMARTPEAK_GITHUB_TOKEN} | gh auth login --with-token
-            gh pr create --title "Release v${VERSION}" --body " " --base develop --head ${CIRCLE_BRANCH}
+            gh pr create --title "Release v${VERSION}" --body " " --base develop --head origin/${CIRCLE_BRANCH}
       - run:
           name: "Publish release to github"
           command: |
