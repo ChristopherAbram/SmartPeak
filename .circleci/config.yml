@@ -137,7 +137,10 @@ jobs:
       - run:
           name: "Install prerequisites"
           command: |
+            apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+            apt-add-repository https://cli.github.com/packages
             apt-get update
+            apt-get install -y gh
             apt-get install -y curl wget jq
             pip install gitpython
             GHR_VERSION=0.13.0
@@ -186,20 +189,15 @@ jobs:
               fi
               echo 
             done
-      - add_ssh_keys:
-          fingerprints:
-            - "83:59:00:aa:ed:0a:96:76:d5:27:54:79:37:8c:f8:94"
       - run:
-          name: "Auto-merge release branch"
+          name: "Auto PR"
           command: |
-            git config --global user.email "krzyja@biosustain.dtu.dk"
-            git config --global user.name "ChristopherAbram"
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
             git checkout ${CIRCLE_BRANCH}
             git pull origin ${CIRCLE_BRANCH}
-            git checkout develop
-            git branch
-            git merge ${CIRCLE_BRANCH} --no-edit
-            git push origin develop
+            echo ${GITHUB_TOKEN} | gh auth login --with-token
+            gh pr create --title "Release v${VERSION}" --body "" --base develop
       - run:
           name: "Publish release to github"
           command: |
@@ -209,7 +207,7 @@ jobs:
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             RELEASE_BODY=$(smartpeak_changes)
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c develop -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_BRANCH} -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
             
       - run:
           name: "Notify users"
